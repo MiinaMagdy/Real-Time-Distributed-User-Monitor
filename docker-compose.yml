@@ -1,0 +1,33 @@
+services:
+  redis:
+    image: redis:alpine
+    container_name: redis
+
+  server-a:
+    build: ./server
+    container_name: server-a
+    environment:
+      - SERVER_NAME=A
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+
+  server-b:
+    build: ./server
+    container_name: server-b
+    environment:
+      - SERVER_NAME=B
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+
+  nginx:
+    build: ./nginx
+    container_name: nginx-lb
+    ports:
+      - "8080:80"
+    depends_on:
+      - server-a
+      - server-b

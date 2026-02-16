@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <h1>Online Users</h1>
+    <div id="users"></div>
+    <script>
+        const socket = io("http://localhost:8080", {
+            transports: ["websocket", "polling"]
+        });
+        socket.on("user:connected", (data) => {
+            console.log(data);
+            document.getElementById("users").innerHTML = JSON.stringify(data);
+        });
+        socket.on("user:disconnected", (data) => {
+            console.log(data);
+            document.getElementById("users").innerHTML = JSON.stringify(data);
+        });
+        socket.on("connect", () => {
+            console.log("Connected to server");
+        });
+    </script>
+</body>
+
+</html>

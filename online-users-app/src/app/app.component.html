@@ -1,0 +1,199 @@
+<div class="dashboard">
+  <!-- Background decorations -->
+  <div class="bg-orb bg-orb--1"></div>
+  <div class="bg-orb bg-orb--2"></div>
+  <div class="bg-orb bg-orb--3"></div>
+
+  <!-- Header -->
+  <header class="header glass">
+    <div class="header__left">
+      <div class="header__logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M5 12.5C5 12.8138 5.02614 13.1219 5.07625 13.4219M19 12.5C19 12.8138 18.9739 13.1219 18.9237 13.4219M5.07625 13.4219C5.55712 16.5697 8.48212 19 12 19C15.5179 19 18.4429 16.5697 18.9237 13.4219M5.07625 13.4219L3 14M18.9237 13.4219L21 14M12 5V3M8 5.5L7 4M16 5.5L17 4M7.5 8H16.5C16.5 8 18 8 18.5 9.5C19 11 19 12.5 19 12.5H5C5 12.5 5 11 5.5 9.5C6 8 7.5 8 7.5 8Z"
+            stroke="url(#headerGrad)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          <defs>
+            <linearGradient id="headerGrad" x1="3" y1="3" x2="21" y2="19">
+              <stop stop-color="#00d4ff" />
+              <stop offset="1" stop-color="#a855f7" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h1 class="header__title">Server Monitor</h1>
+    </div>
+    <div class="header__right">
+      <div class="header__status" [class.header__status--connected]="connectionStatus === 'connected'"
+        [class.header__status--connecting]="connectionStatus === 'connecting'">
+        <span class="status-dot"></span>
+        <span class="status-text">{{ connectionStatus === 'connected' ? 'Live' : connectionStatus === 'connecting' ?
+          'Connecting...' : 'Disconnected' }}</span>
+      </div>
+      <div class="header__time">
+        {{ currentTime | date:'HH:mm:ss' }}
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats Cards -->
+  <section class="stats-row">
+    <div class="stat-card glass">
+      <div class="stat-card__icon stat-card__icon--users">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M16 21V19C16 16.7909 14.2091 15 12 15H5C2.79086 15 1 16.7909 1 19V21M20 8V14M23 11H17M12.5 7C12.5 9.20914 10.7091 11 8.5 11C6.29086 11 4.5 9.20914 4.5 7C4.5 4.79086 6.29086 3 8.5 3C10.7091 3 12.5 4.79086 12.5 7Z"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="stat-card__content">
+        <span class="stat-card__value">{{ totalOnlineUsers }}</span>
+        <span class="stat-card__label">Online Users</span>
+      </div>
+    </div>
+
+    <div class="stat-card glass">
+      <div class="stat-card__icon stat-card__icon--servers">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M2 5C2 3.89543 2.89543 3 4 3H20C21.1046 3 22 3.89543 22 5V9C22 10.1046 21.1046 11 20 11H4C2.89543 11 2 10.1046 2 9V5ZM2 15C2 13.8954 2.89543 13 4 13H20C21.1046 13 22 13.8954 22 15V19C22 20.1046 21.1046 21 20 21H4C2.89543 21 2 20.1046 2 19V15ZM6 7H6.01M6 17H6.01"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="stat-card__content">
+        <span class="stat-card__value">{{ activeServerCount }}</span>
+        <span class="stat-card__label">Active Servers</span>
+        @if (myServer) {
+        <span class="stat-card__sublabel">Connected to {{ myServer }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="stat-card glass">
+      <div class="stat-card__icon" [class.stat-card__icon--online]="connectionStatus === 'connected'"
+        [class.stat-card__icon--offline]="connectionStatus !== 'connected'">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M8.111 16.404a5.5 5.5 0 0 1 7.778 0M12 20h.01M4.93 13.222a9.003 9.003 0 0 1 14.142 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="stat-card__content">
+        <span class="stat-card__value stat-card__value--small" [class.text-green]="connectionStatus === 'connected'"
+          [class.text-yellow]="connectionStatus === 'connecting'"
+          [class.text-red]="connectionStatus === 'disconnected'">
+          {{ connectionStatus === 'connected' ? 'Online' : connectionStatus === 'connecting' ? 'Connecting' : 'Offline'
+          }}
+        </span>
+        <span class="stat-card__label">Connection</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main content area -->
+  <div class="main-content">
+    <!-- Server Cards -->
+    <section class="servers-section">
+      <h2 class="section-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M2 5C2 3.89543 2.89543 3 4 3H20C21.1046 3 22 3.89543 22 5V9C22 10.1046 21.1046 11 20 11H4C2.89543 11 2 10.1046 2 9V5Z"
+            stroke="currentColor" stroke-width="1.5" />
+          <path
+            d="M2 15C2 13.8954 2.89543 13 4 13H20C21.1046 13 22 13.8954 22 15V19C22 20.1046 21.1046 21 20 21H4C2.89543 21 2 20.1046 2 19V15Z"
+            stroke="currentColor" stroke-width="1.5" />
+          <circle cx="6" cy="7" r="1" fill="currentColor" />
+          <circle cx="6" cy="17" r="1" fill="currentColor" />
+        </svg>
+        Server Nodes
+      </h2>
+
+      @if (serverList.length === 0) {
+      <div class="empty-state glass">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+            stroke="currentColor" stroke-width="1.5" opacity="0.4" />
+          <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        <p>Waiting for server connections...</p>
+      </div>
+      }
+
+      <div class="servers-grid">
+        @for (server of serverList; track server.serverName) {
+        <div class="server-card glass" [class.server-card--active]="server.connectedUsers > 0"
+          [class.server-card--current]="server.serverName === myServer">
+          <div class="server-card__header">
+            <div class="server-card__badge">
+              <span class="server-card__indicator"
+                [class.server-card__indicator--active]="server.connectedUsers > 0"></span>
+              Server {{ server.serverName }}
+              @if (server.serverName === myServer) {
+              <span class="server-card__you-badge">Your Connection</span>
+              }
+            </div>
+          </div>
+
+          <div class="server-card__stats">
+            <div class="server-card__stat">
+              <span class="server-card__stat-value">{{ server.connectedUsers }}</span>
+              <span class="server-card__stat-label">Connected Users</span>
+            </div>
+            <div class="server-card__stat">
+              <span class="server-card__stat-value">{{ getServerLoadPercent(server) }}%</span>
+              <span class="server-card__stat-label">Load Share</span>
+            </div>
+          </div>
+
+          <div class="server-card__progress">
+            <div class="server-card__progress-bar">
+              <div class="server-card__progress-fill" [style.width.%]="getServerLoadPercent(server)"></div>
+            </div>
+          </div>
+
+          <div class="server-card__footer">
+            <span class="server-card__timestamp">Last update: {{ getTimeSince(server.timestamp) }}</span>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+
+    <!-- Activity Feed -->
+    <section class="feed-section">
+      <h2 class="section-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M22 12H18L15 21L9 3L6 12H2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        Activity Feed
+      </h2>
+
+      <div class="feed glass">
+        @if (eventLog.length === 0) {
+        <div class="feed__empty">
+          <p>No activity yet...</p>
+        </div>
+        }
+
+        @for (event of eventLog; track $index) {
+        <div class="feed__item" [class.feed__item--connected]="event.type === 'connected'"
+          [class.feed__item--disconnected]="event.type === 'disconnected'">
+          <div class="feed__item-dot"></div>
+          <div class="feed__item-content">
+            <div class="feed__item-header">
+              <span class="feed__item-type">
+                {{ event.type === 'connected' ? 'User Connected' : 'User Disconnected' }}
+              </span>
+              <span class="feed__item-time">{{ event.timestamp | date:'HH:mm:ss' }}</span>
+            </div>
+            <div class="feed__item-details">
+              Server {{ event.server }} · {{ event.users }} users on node · {{ event.totalOnline }} total online
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+  </div>
+</div>
